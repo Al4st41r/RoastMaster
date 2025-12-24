@@ -3,7 +3,7 @@ import { SetupForm } from './components/SetupForm';
 import { PlanReview } from './components/PlanReview';
 import { ActiveTimer } from './components/ActiveTimer';
 import { RoastConfig, RoastSchedule } from './types';
-import { generateRoastSchedule } from './services/geminiService';
+import { generateRoastSchedule } from './services/scheduler';
 
 enum AppStep {
   SETUP,
@@ -27,7 +27,7 @@ const App: React.FC = () => {
       setStep(AppStep.REVIEW);
     } catch (error) {
       console.error(error);
-      alert("Failed to generate schedule. Please check your API key and try again.");
+      alert("Failed to generate schedule. Please try again.");
     } finally {
       setLoading(false);
     }
