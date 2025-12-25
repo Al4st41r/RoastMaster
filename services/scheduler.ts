@@ -1,9 +1,13 @@
 import { RoastConfig, RoastSchedule, CookingStep, CookingMethod } from '../types';
 
-const calculateMeatTime = (meat: string, weightKg: number): number => {
+const calculateMeatTime = (meat: string, weightKg: number, doneness?: string): number => {
   const weight500g = weightKg * 2;
   
-  if (meat.includes('Beef')) return Math.ceil(weight500g * 20 + 20); // Medium
+  if (meat.includes('Beef')) {
+    if (doneness === 'Rare') return Math.ceil(weight500g * 15 + 20);
+    if (doneness === 'Well Done') return Math.ceil(weight500g * 25 + 20);
+    return Math.ceil(weight500g * 20 + 20); // Medium (Default)
+  }
   if (meat.includes('Chicken')) return Math.ceil(weight500g * 20 + 20);
   if (meat.includes('Lamb')) return Math.ceil(weight500g * 25 + 25);
   if (meat.includes('Pork')) return Math.ceil(weight500g * 30 + 30);
@@ -24,7 +28,7 @@ export const generateRoastSchedule = async (config: RoastConfig): Promise<RoastS
     // Keeping async allows for easy transition if we ever add async logic back.
     
     const steps: CookingStep[] = [];
-    const meatCookingTime = calculateMeatTime(config.meat, config.weightKg);
+    const meatCookingTime = calculateMeatTime(config.meat, config.weightKg, config.doneness);
     const restingTime = getRestingTime(config.meat);
     
     // Meat IN
@@ -34,9 +38,13 @@ export const generateRoastSchedule = async (config: RoastConfig): Promise<RoastS
     // Meat goes in at T=restingTime + meatCookingTime.
     const meatInTime = meatCookingTime + restingTime;
     
+    const meatAction = config.doneness && config.meat.includes('Beef') 
+      ? `Put ${config.meat} (${config.doneness}) in oven`
+      : `Put ${config.meat} in oven`;
+
     steps.push({
         minutesBeforeServing: meatInTime,
-        action: `Put ${config.meat} in oven`,
+        action: meatAction,
         description: `Season and place in oven at 180°C/160°C Fan. Cooking for ${meatCookingTime} mins.`,
         isAlert: true
     });
