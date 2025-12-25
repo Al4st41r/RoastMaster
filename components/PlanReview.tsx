@@ -80,8 +80,13 @@ export const PlanReview: React.FC<Props> = ({ schedule, onStart, onBack }) => {
         </div>
 
         <button 
-          onClick={() => onStart(targetTime)}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-transform active:scale-95"
+          onClick={() => targetTime && onStart(targetTime)}
+          disabled={!targetTime}
+          className={`w-full font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-transform active:scale-95 ${
+            !targetTime 
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed transform-none' 
+              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+          }`}
         >
           <PlayCircle className="w-6 h-6" />
           Start Timer

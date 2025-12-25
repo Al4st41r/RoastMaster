@@ -8,6 +8,19 @@ interface Props {
 }
 
 export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
+  // Validate targetTime immediately to prevent crashes
+  const [validHours, validMinutes] = targetTime ? targetTime.split(':').map(Number) : [NaN, NaN];
+  if (isNaN(validHours) || isNaN(validMinutes)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="bg-red-50 text-red-600 p-6 rounded-lg shadow-sm border border-red-100">
+          <h3 className="font-bold text-lg mb-2">Timer Error</h3>
+          <p>Invalid target time provided. Please go back and select a valid time.</p>
+        </div>
+      </div>
+    );
+  }
+
   const [now, setNow] = useState(new Date());
   // Determine absolute timestamps
   const [steps, setSteps] = useState<(CookingStep & { absoluteTime: Date, completed: boolean, isNext: boolean })[]>([]);
