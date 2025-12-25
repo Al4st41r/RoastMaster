@@ -55,23 +55,39 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
     const interval = setInterval(() => {
       setNow(new Date());
     }, 1000);
+    
+    // Update immediately on visibility change (wake up)
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            setNow(new Date());
+        }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    return () => clearInterval(interval);
+    return () => {
+        clearInterval(interval);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [schedule, targetTime]);
 
   // Check for alarms and updates
   useEffect(() => {
     setSteps(currentSteps => {
       let nextFound = false;
+      let audioPlayed = false;
+
       return currentSteps.map((step, idx) => {
         const timeDiff = step.absoluteTime.getTime() - now.getTime();
         const isPast = timeDiff < 0;
         
-        // Alarm logic: If we just passed the time (within last second) and it's an alert step
-        if (isPast && !step.completed && step.isAlert && Math.abs(timeDiff) < 2000) {
-          audioRef.current?.play().catch(e => console.log("Audio play failed", e));
-          if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-          new Notification("Roast Planner Step", { body: step.action });
+        // Alarm logic: If we just passed the time (or passed it while sleeping) and haven't marked it completed
+        if (isPast && !step.completed && step.isAlert) {
+          if (!audioPlayed) {
+              audioRef.current?.play().catch(e => console.log("Audio play failed", e));
+              if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+              new Notification("Roast Planner Step", { body: step.action });
+              audioPlayed = true; // Prevent multiple overlapping sounds
+          }
         }
 
         let isNext = false;
@@ -191,7 +207,7 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
       </div>
       
       <div className="text-center text-xs text-gray-400">
-        Don't let the screen sleep!
+        Timer syncs with your clock. Safe to let screen sleep.
       </div>
     </div>
   );
