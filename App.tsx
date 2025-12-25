@@ -40,23 +40,18 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-900 font-sans pb-10">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-serif text-xl font-bold text-emerald-800">
-             <span>🍖</span> RoastMaster
-          </div>
-          {step !== AppStep.SETUP && (
-            <button 
-              onClick={() => setStep(AppStep.SETUP)}
-              className="text-sm text-gray-500 hover:text-emerald-600"
-            >
-              New Roast
-            </button>
-          )}
-        </div>
-      </header>
-
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {step !== AppStep.SETUP && (
+            <div className="mb-4 flex justify-end">
+                <button 
+                  onClick={() => setStep(AppStep.SETUP)}
+                  className="text-sm text-gray-500 hover:text-emerald-600"
+                >
+                  New Roast
+                </button>
+            </div>
+        )}
+
         {step === AppStep.SETUP && (
           <SetupForm onGenerate={handleGenerate} isLoading={loading} />
         )}

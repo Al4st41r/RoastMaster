@@ -41,8 +41,8 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
       <div className="bg-emerald-900 p-6 text-white text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-300 via-transparent to-transparent" />
         <ChefHat className="w-12 h-12 mx-auto mb-2" />
-        <h1 className="text-3xl font-bold font-serif">Sunday Roast Planner</h1>
-        <p className="text-emerald-100 mt-2">Perfect timing for your Great British meal</p>
+        <h1 className="text-3xl font-bold font-serif">Roast Planner</h1>
+        <p className="text-emerald-100 mt-2">Perfect timing for your great roast meal</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">

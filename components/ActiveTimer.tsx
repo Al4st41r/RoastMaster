@@ -58,7 +58,7 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
         if (isPast && !step.completed && step.isAlert && Math.abs(timeDiff) < 2000) {
           audioRef.current?.play().catch(e => console.log("Audio play failed", e));
           if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-          new Notification("RoastMaster Step", { body: step.action });
+          new Notification("Roast Planner Step", { body: step.action });
         }
 
         let isNext = false;
