@@ -45,7 +45,7 @@ const App: React.FC = () => {
             <div className="mb-4 flex justify-end">
                 <button 
                   onClick={() => setStep(AppStep.SETUP)}
-                  className="text-sm text-gray-500 hover:text-emerald-600"
+                  className="text-sm text-gray-500 hover:text-emerald-700"
                 >
                   New Roast
                 </button>

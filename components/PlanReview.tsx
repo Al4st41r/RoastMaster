@@ -85,7 +85,7 @@ export const PlanReview: React.FC<Props> = ({ schedule, onStart, onBack }) => {
           className={`w-full font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-transform active:scale-95 ${
             !targetTime 
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed transform-none' 
-              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              : 'bg-emerald-700 hover:bg-emerald-800 text-white'
           }`}
         >
           <PlayCircle className="w-6 h-6" />

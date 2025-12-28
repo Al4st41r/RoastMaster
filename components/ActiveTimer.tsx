@@ -85,7 +85,14 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
           if (!audioPlayed) {
               audioRef.current?.play().catch(e => console.log("Audio play failed", e));
               if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-              new Notification("Roast Planner Step", { body: step.action });
+              
+              if ('Notification' in window && Notification.permission === 'granted') {
+                 try {
+                    new Notification("Roast Planner Step", { body: step.action });
+                 } catch (e) {
+                    console.error("Notification failed", e);
+                 }
+              }
               audioPlayed = true; // Prevent multiple overlapping sounds
           }
         }
@@ -101,8 +108,8 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
     });
     
     // Request notification permission if not granted
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(e => console.log("Permission request failed", e));
     }
 
   }, [now]);

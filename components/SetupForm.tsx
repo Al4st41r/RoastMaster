@@ -8,6 +8,19 @@ interface Props {
   isLoading: boolean;
 }
 
+const VegetableIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 451 450" 
+    className={className}
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g transform="matrix(1,0,0,1,-1779.785928,-630.576904)">
+        <path d="M1962.97,895.953C1946.82,881.59 1933.69,865.577 1917.15,851.682C1907.17,868.243 1897.88,883.671 1888.2,899.752C1900.07,911.827 1911.51,923.469 1923.46,935.626C1916.7,942.364 1910.57,948.474 1903.01,956.014C1892.83,945.365 1883.55,935.655 1874.27,925.943C1863.14,940.28 1812.38,1037.47 1809.16,1051.38C1812.87,1049.77 1815.79,1048.64 1818.57,1047.27C1896.3,1008.74 1972.08,966.782 2044.22,918.485C2066.679,903.45 2088.77,887.816 2107.97,868.569C2125.73,850.757 2126.22,827.003 2109.17,808.51C2104.71,803.665 2099.9,799.131 2095.24,794.472C2080.54,779.792 2066.02,764.937 2051.1,750.49C2028.38,728.494 1996.91,737.506 1983.54,761.446C2002.25,780.253 2021.18,799.27 2039.88,818.057C2033.33,824.872 2027.69,830.736 2021.47,837.208C2002.29,819.054 1984.68,800.143 1964.92,781.394C1953.72,797.405 1943.4,812.17 1932.69,827.493C1941.31,836.157 1949.4,844.305 1957.51,852.447C1965.56,860.539 1973.62,868.623 1981.85,876.892C1975.32,883.491 1969.55,889.309 1962.97,895.953ZM2084.62,745.065C2098.59,708.801 2111.95,674.146 2125.65,638.604C2134.04,641.755 2141.91,644.706 2150.95,648.098C2143.23,668.438 2135.7,688.29 2128.36,707.648C2129.05,708.648 2129.18,709.05 2129.44,709.148C2129.69,709.248 2130.08,709.084 2130.39,708.978C2130.69,708.874 2130.99,708.73 2131.25,708.545C2131.79,708.164 2132.35,707.794 2132.81,707.332C2158.29,681.972 2183.76,656.602 2209.24,631.246C2209.46,631.032 2209.84,630.984 2210.82,630.577C2217.94,634.739 2222.6,642.068 2230.13,648.29C2203.1,676.176 2175.47,702.602 2148.95,730.089C2149.33,730.686 2149.72,731.283 2150.1,731.879C2170.21,724.267 2190.32,716.655 2211.23,708.738C2214.66,717.377 2217.67,724.936 2221.17,733.738C2185.77,747.422 2150.68,760.983 2114.47,774.979C2120.6,781.394 2125.7,786.46 2130.49,791.798C2155.67,819.833 2154.63,860.908 2127.84,887.333C2104.72,910.139 2078.21,928.685 2051.23,946.489C1978.75,994.328 1902.99,1036.43 1824.86,1074.29C1820.44,1076.43 1815.8,1078.65 1811.04,1079.43C1789.65,1082.91 1773.54,1061.97 1782.15,1041.56C1787.78,1028.21 1794.45,1015.29 1801.05,1002.38C1829.44,946.875 1859.66,892.397 1892.78,839.564C1912.05,808.823 1931.94,778.47 1955.29,750.616C1962.67,741.811 1970.36,732.988 1979.17,725.707C2004.04,705.163 2041.33,706.108 2065.73,727.199C2071.679,732.338 2077.179,737.996 2084.62,745.065Z" />
+    </g>
+  </svg>
+);
+
 export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
   const [meat, setMeat] = useState(MEAT_OPTIONS[0]);
   const [weight, setWeight] = useState(1.5);
@@ -61,14 +74,14 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
               <select 
                 value={meat} 
                 onChange={(e) => setMeat(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all"
               >
                 {MEAT_OPTIONS.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
             {meat.includes('Beef') && (
-              <div className="md:col-span-2 bg-red-50 p-4 rounded-xl border border-red-100 animate-in fade-in slide-in-from-top-2">
-                 <label className="block text-sm font-medium text-red-900 mb-2">How do you like your Beef?</label>
+              <div className="md:col-span-2 bg-rose-50/50 p-4 rounded-xl border border-rose-100 animate-in fade-in slide-in-from-top-2">
+                 <label className="block text-sm font-medium text-rose-900 mb-2">How do you like your Beef?</label>
                  <div className="flex gap-2">
                     {(['Rare', 'Medium', 'Well Done'] as const).map(d => (
                       <button
@@ -77,8 +90,8 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                         onClick={() => setDoneness(d)}
                         className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-all ${
                           doneness === d 
-                            ? 'bg-red-600 text-white border-red-600 shadow-sm font-medium' 
-                            : 'bg-white text-gray-600 border-red-200 hover:bg-red-50'
+                            ? 'bg-rose-600 text-white border-rose-600 shadow-sm font-medium' 
+                            : 'bg-white text-gray-600 border-rose-200 hover:bg-rose-50'
                         }`}
                       >
                         {d}
@@ -96,7 +109,7 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                 max="10"
                 value={weight} 
                 onChange={(e) => setWeight(parseFloat(e.target.value))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all"
               />
             </div>
           </div>
@@ -109,25 +122,25 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
             <h2 className="text-xl font-semibold">The Oven</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${ovenType === OvenType.SINGLE ? 'border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500' : 'border-gray-200 hover:border-emerald-300'}`}>
+            <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${ovenType === OvenType.SINGLE ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600' : 'border-gray-200 hover:border-emerald-400'}`}>
               <input 
                 type="radio" 
                 name="oven" 
                 value={OvenType.SINGLE} 
                 checked={ovenType === OvenType.SINGLE}
                 onChange={() => setOvenType(OvenType.SINGLE)}
-                className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                className="w-4 h-4 text-emerald-700 focus:ring-emerald-600"
               />
               <span className="ml-3 font-medium text-gray-800">Single Oven</span>
             </label>
-            <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${ovenType === OvenType.MULTI ? 'border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500' : 'border-gray-200 hover:border-emerald-300'}`}>
+            <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${ovenType === OvenType.MULTI ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600' : 'border-gray-200 hover:border-emerald-400'}`}>
               <input 
                 type="radio" 
                 name="oven" 
                 value={OvenType.MULTI} 
                 checked={ovenType === OvenType.MULTI}
                 onChange={() => setOvenType(OvenType.MULTI)}
-                className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                className="w-4 h-4 text-emerald-700 focus:ring-emerald-600"
               />
               <span className="ml-3 font-medium text-gray-800">Multiple Ovens</span>
             </label>
@@ -137,14 +150,14 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
         {/* Vegetables Section */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 text-emerald-800 border-b pb-2 border-emerald-100">
-            <div className="w-5 h-5 flex items-center justify-center">🥕</div>
+            <VegetableIcon className="w-5 h-5" />
             <h2 className="text-xl font-semibold">Vegetables & Sides</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {veggies.map((veg) => (
               <div 
                 key={veg.id} 
-                className={`p-3 rounded-xl border transition-all ${veg.selected ? 'border-emerald-500 bg-emerald-50 shadow-sm' : 'border-gray-200 bg-gray-50 opacity-70'}`}
+                className={`p-3 rounded-xl border transition-all ${veg.selected ? 'border-emerald-600 bg-emerald-50 shadow-sm' : 'border-gray-200 bg-gray-50 opacity-70'}`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900">{veg.name}</span>
@@ -152,7 +165,7 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                     type="checkbox" 
                     checked={veg.selected} 
                     onChange={() => handleVeggieToggle(veg.id)}
-                    className="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300"
+                    className="w-5 h-5 rounded text-emerald-700 focus:ring-emerald-600 border-gray-300"
                   />
                 </div>
                 {veg.selected && veg.allowedMethods.length > 1 && (
@@ -189,7 +202,7 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                     key={opt}
                     type="button"
                     onClick={() => setGravy(opt)}
-                    className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${gravy === opt ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+                    className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${gravy === opt ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
                    >
                      {opt}
                    </button>
@@ -204,7 +217,7 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                     key={opt}
                     type="button"
                     onClick={() => setStuffing(opt)}
-                    className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${stuffing === opt ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+                    className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${stuffing === opt ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
                    >
                      {opt}
                    </button>
