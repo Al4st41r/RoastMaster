@@ -21,10 +21,12 @@ export interface VeggieSelection {
 export interface RoastConfig {
   meat: string;
   weightKg: number;
+  doneness?: 'Rare' | 'Medium' | 'Well Done';
   ovenType: OvenType;
   veggies: VeggieSelection[];
   gravy: 'Packet' | 'Homemade' | 'None';
   stuffing: 'Packet' | 'Homemade' | 'None';
+  yorkshires: 'Packet' | 'Homemade' | 'None';
   servingTime?: string; // HH:MM format
 }
 

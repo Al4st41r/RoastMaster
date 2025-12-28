@@ -1,5 +1,5 @@
 {
-  "name": "RoastMaster AI",
-  "description": "An intelligent British Roast Dinner planner and timer. Generates perfectly timed schedules for your specific meat, weight, and vegetable choices using Gemini AI.",
+  "name": "Roast Planner",
+  "description": "An intelligent British Roast Dinner planner and timer. Generates perfectly timed schedules for your specific meat, weight, and vegetable choices.",
   "requestFramePermissions": []
 }

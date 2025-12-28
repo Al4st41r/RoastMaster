@@ -8,6 +8,19 @@ interface Props {
 }
 
 export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
+  // Validate targetTime immediately to prevent crashes
+  const [validHours, validMinutes] = targetTime ? targetTime.split(':').map(Number) : [NaN, NaN];
+  if (isNaN(validHours) || isNaN(validMinutes)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="bg-red-50 text-red-600 p-6 rounded-lg shadow-sm border border-red-100">
+          <h3 className="font-bold text-lg mb-2">Timer Error</h3>
+          <p>Invalid target time provided. Please go back and select a valid time.</p>
+        </div>
+      </div>
+    );
+  }
+
   const [now, setNow] = useState(new Date());
   // Determine absolute timestamps
   const [steps, setSteps] = useState<(CookingStep & { absoluteTime: Date, completed: boolean, isNext: boolean })[]>([]);
@@ -42,23 +55,46 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
     const interval = setInterval(() => {
       setNow(new Date());
     }, 1000);
+    
+    // Update immediately on visibility change (wake up)
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            setNow(new Date());
+        }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    return () => clearInterval(interval);
+    return () => {
+        clearInterval(interval);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [schedule, targetTime]);
 
   // Check for alarms and updates
   useEffect(() => {
     setSteps(currentSteps => {
       let nextFound = false;
+      let audioPlayed = false;
+
       return currentSteps.map((step, idx) => {
         const timeDiff = step.absoluteTime.getTime() - now.getTime();
         const isPast = timeDiff < 0;
         
-        // Alarm logic: If we just passed the time (within last second) and it's an alert step
-        if (isPast && !step.completed && step.isAlert && Math.abs(timeDiff) < 2000) {
-          audioRef.current?.play().catch(e => console.log("Audio play failed", e));
-          if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-          new Notification("RoastMaster Step", { body: step.action });
+        // Alarm logic: If we just passed the time (or passed it while sleeping) and haven't marked it completed
+        if (isPast && !step.completed && step.isAlert) {
+          if (!audioPlayed) {
+              audioRef.current?.play().catch(e => console.log("Audio play failed", e));
+              if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+              
+              if ('Notification' in window && Notification.permission === 'granted') {
+                 try {
+                    new Notification("Roast Planner Step", { body: step.action });
+                 } catch (e) {
+                    console.error("Notification failed", e);
+                 }
+              }
+              audioPlayed = true; // Prevent multiple overlapping sounds
+          }
         }
 
         let isNext = false;
@@ -72,8 +108,8 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
     });
     
     // Request notification permission if not granted
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(e => console.log("Permission request failed", e));
     }
 
   }, [now]);
@@ -178,7 +214,7 @@ export const ActiveTimer: React.FC<Props> = ({ schedule, targetTime }) => {
       </div>
       
       <div className="text-center text-xs text-gray-400">
-        Don't let the screen sleep!
+        Timer syncs with your clock. Safe to let screen sleep.
       </div>
     </div>
   );
