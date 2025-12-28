@@ -29,6 +29,7 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
   const [veggies, setVeggies] = useState<VeggieSelection[]>(VEGGIE_OPTIONS);
   const [gravy, setGravy] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
   const [stuffing, setStuffing] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
+  const [yorkshires, setYorkshires] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
 
   const handleVeggieToggle = (id: string) => {
     setVeggies(prev => prev.map(v => v.id === id ? { ...v, selected: !v.selected } : v));
@@ -47,7 +48,8 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
       ovenType,
       veggies,
       gravy,
-      stuffing
+      stuffing,
+      yorkshires
     });
   };
 
@@ -218,6 +220,21 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                     type="button"
                     onClick={() => setStuffing(opt)}
                     className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${stuffing === opt ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+                   >
+                     {opt}
+                   </button>
+                 ))}
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Yorkshire Puddings</label>
+              <div className="flex gap-2">
+                 {(['Packet', 'Homemade', 'None'] as const).map(opt => (
+                   <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setYorkshires(opt)}
+                    className={`flex-1 py-2 px-3 text-sm rounded-lg border transition-colors ${yorkshires === opt ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
                    >
                      {opt}
                    </button>

@@ -26,6 +26,7 @@ export interface RoastConfig {
   veggies: VeggieSelection[];
   gravy: 'Packet' | 'Homemade' | 'None';
   stuffing: 'Packet' | 'Homemade' | 'None';
+  yorkshires: 'Packet' | 'Homemade' | 'None';
   servingTime?: string; // HH:MM format
 }
 

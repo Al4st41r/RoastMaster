@@ -9,16 +9,52 @@ interface Props {
 }
 
 export const PlanReview: React.FC<Props> = ({ schedule, onStart, onBack }) => {
+  const [mode, setMode] = React.useState<'now' | 'plan'>('now');
   const [targetTime, setTargetTime] = React.useState<string>('14:00');
 
-  // Helper to calculate start time based on serving time input
-  const calculateStartTime = () => {
-    const [hours, minutes] = targetTime.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    // Subtract duration
-    const startDate = new Date(date.getTime() - schedule.totalDurationMinutes * 60000);
-    return startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Helper to format time
+  const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Calculate times based on mode
+  const getTimingInfo = () => {
+    const now = new Date();
+    
+    if (mode === 'now') {
+        const serveTime = new Date(now.getTime() + schedule.totalDurationMinutes * 60000);
+        return {
+            serveDate: serveTime,
+            serveTimeStr: formatTime(serveTime),
+            startTimeStr: "Now",
+            primaryLabel: "Dinner Ready At",
+            primaryValue: formatTime(serveTime),
+            secondaryLabel: "Start cooking",
+            secondaryValue: "immediately"
+        };
+    } else {
+        const [hours, minutes] = targetTime.split(':').map(Number);
+        const serveDate = new Date();
+        serveDate.setHours(hours, minutes, 0, 0);
+        
+        // If target is in past, assume tomorrow? For simplicity, just use today's date logic
+        // but typically user picks a future time.
+        
+        const startDate = new Date(serveDate.getTime() - schedule.totalDurationMinutes * 60000);
+        return {
+            serveDate: serveDate,
+            serveTimeStr: targetTime,
+            startTimeStr: formatTime(startDate),
+            primaryLabel: "Start Cooking At",
+            primaryValue: formatTime(startDate),
+            secondaryLabel: "Serve dinner at",
+            secondaryValue: targetTime
+        };
+    }
+  };
+
+  const timing = getTimingInfo();
+
+  const handleStart = () => {
+      onStart(timing.serveTimeStr);
   };
 
   return (
@@ -49,15 +85,45 @@ export const PlanReview: React.FC<Props> = ({ schedule, onStart, onBack }) => {
            </div>
 
            <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 flex flex-col justify-center">
-             <label className="block text-emerald-800 font-medium mb-2 text-center">When do you want to eat?</label>
-             <input 
-               type="time" 
-               value={targetTime}
-               onChange={(e) => setTargetTime(e.target.value)}
-               className="text-3xl font-bold text-center bg-transparent border-b-2 border-emerald-300 focus:border-emerald-600 outline-none text-emerald-900 w-full"
-             />
+             {/* Toggle Mode */}
+             <div className="flex bg-emerald-100/50 p-1 rounded-lg mb-4">
+                <button 
+                    onClick={() => setMode('now')}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mode === 'now' ? 'bg-white text-emerald-800 shadow-sm' : 'text-emerald-600 hover:text-emerald-800'}`}
+                >
+                    Start Now
+                </button>
+                <button 
+                    onClick={() => setMode('plan')}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mode === 'plan' ? 'bg-white text-emerald-800 shadow-sm' : 'text-emerald-600 hover:text-emerald-800'}`}
+                >
+                    Plan Ahead
+                </button>
+             </div>
+
+             {mode === 'plan' ? (
+                 <>
+                    <label className="block text-emerald-800 font-medium mb-1 text-center text-sm">When do you want to eat?</label>
+                    <input 
+                    type="time" 
+                    value={targetTime}
+                    onChange={(e) => setTargetTime(e.target.value)}
+                    className="text-3xl font-bold text-center bg-transparent border-b-2 border-emerald-300 focus:border-emerald-600 outline-none text-emerald-900 w-full mb-2"
+                    />
+                 </>
+             ) : (
+                 <div className="text-center mb-2">
+                    <span className="block text-emerald-800 font-medium text-sm mb-1">Dinner will be ready at</span>
+                    <span className="text-3xl font-bold text-emerald-900">{timing.primaryValue}</span>
+                 </div>
+             )}
+
              <div className="mt-2 text-center text-sm text-emerald-700">
-                Start cooking at <span className="font-bold">{calculateStartTime()}</span>
+                {mode === 'plan' ? (
+                    <>Start cooking at <span className="font-bold">{timing.primaryValue}</span></>
+                ) : (
+                    <>Total time: {Math.floor(schedule.totalDurationMinutes / 60)}h {schedule.totalDurationMinutes % 60}m</>
+                )}
              </div>
            </div>
         </div>
@@ -65,25 +131,28 @@ export const PlanReview: React.FC<Props> = ({ schedule, onStart, onBack }) => {
         <div className="space-y-4 mb-8">
           <h3 className="font-semibold text-gray-700">Sequence Preview</h3>
           <div className="h-64 overflow-y-auto border rounded-lg p-2 bg-gray-50">
-             {schedule.steps.sort((a, b) => b.minutesBeforeServing - a.minutesBeforeServing).map((step, idx) => (
+             {schedule.steps.sort((a, b) => b.minutesBeforeServing - a.minutesBeforeServing).map((step, idx) => {
+               const stepTime = new Date(timing.serveDate.getTime() - step.minutesBeforeServing * 60000);
+               return (
                <div key={idx} className="flex gap-3 p-3 border-b last:border-0 border-gray-100 bg-white first:rounded-t-md last:rounded-b-md">
-                 <div className="w-16 text-right font-mono text-gray-400 text-sm pt-1">
-                   -{step.minutesBeforeServing}m
+                 <div className="w-16 text-right pt-1 flex flex-col items-end">
+                   <span className="font-mono text-gray-400 text-sm">-{step.minutesBeforeServing}m</span>
+                   <span className="font-bold text-gray-700 text-sm mt-0.5">{formatTime(stepTime)}</span>
                  </div>
                  <div>
                    <div className="font-medium text-gray-800">{step.action}</div>
                    <div className="text-sm text-gray-500">{step.description}</div>
                  </div>
                </div>
-             ))}
+             )})}
           </div>
         </div>
 
         <button 
-          onClick={() => targetTime && onStart(targetTime)}
-          disabled={!targetTime}
+          onClick={handleStart}
+          disabled={mode === 'plan' && !targetTime}
           className={`w-full font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-transform active:scale-95 ${
-            !targetTime 
+            (mode === 'plan' && !targetTime) 
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed transform-none' 
               : 'bg-emerald-700 hover:bg-emerald-800 text-white'
           }`}

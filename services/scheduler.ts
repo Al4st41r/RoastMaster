@@ -120,6 +120,29 @@ export const generateRoastSchedule = async (config: RoastConfig): Promise<RoastS
          });
     }
 
+    // Yorkshire Puddings
+    if (config.yorkshires === 'Homemade') {
+        steps.push({
+            minutesBeforeServing: 35,
+            action: 'Heat Yorkshire Oil',
+            description: 'Put tray with oil/fat in oven to get smoking hot.',
+            isAlert: true
+        });
+        steps.push({
+            minutesBeforeServing: 25,
+            action: 'Yorkshires In',
+            description: 'Pour batter into hot oil and return to oven immediately. Do not open door!',
+            isAlert: true
+        });
+    } else if (config.yorkshires === 'Packet') {
+        steps.push({
+            minutesBeforeServing: 5,
+            action: 'Warm Yorkshires',
+            description: 'Put packet Yorkshire puddings in oven to warm through.',
+            isAlert: true
+        });
+    }
+
     if (config.gravy !== 'None') {
         steps.push({
             minutesBeforeServing: 15,
