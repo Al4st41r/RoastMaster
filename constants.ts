@@ -78,3 +78,21 @@ export const VEGGIE_OPTIONS: VeggieSelection[] = [
     allowedMethods: [CookingMethod.BOIL, CookingMethod.ROAST] 
   },
 ];
+
+export interface CustomPreset {
+  name: string;
+  method: CookingMethod;
+  durationMinutes: number;
+  note?: string;
+}
+
+export const CUSTOM_PRESETS: CustomPreset[] = [
+  { name: 'Pigs in Blankets', method: CookingMethod.ROAST, durationMinutes: 25, note: 'Turn halfway through.' },
+  { name: 'Bread Sauce', method: CookingMethod.HOB, durationMinutes: 15, note: 'Stir regularly so it does not catch.' },
+  { name: 'Cheese Sauce', method: CookingMethod.HOB, durationMinutes: 10, note: 'Stir constantly.' },
+  { name: 'Red Cabbage', method: CookingMethod.HOB, durationMinutes: 30 },
+  { name: 'Peas', method: CookingMethod.BOIL, durationMinutes: 5 },
+  { name: 'Green Beans', method: CookingMethod.BOIL, durationMinutes: 8 },
+  { name: 'Leeks', method: CookingMethod.BOIL, durationMinutes: 10 },
+  { name: 'Cauliflower Cheese', method: CookingMethod.ROAST, durationMinutes: 25 },
+];
