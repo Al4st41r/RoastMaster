@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OvenType, RoastConfig, VeggieSelection, CookingMethod } from '../types';
-import { MEAT_OPTIONS, VEGGIE_OPTIONS } from '../constants';
-import { ChefHat, Utensils, Thermometer, Info } from 'lucide-react';
+import { MEAT_OPTIONS, VEGGIE_OPTIONS, CUSTOM_PRESETS, CustomPreset } from '../constants';
+import { ChefHat, Utensils, Thermometer, Info, Plus, X } from 'lucide-react';
 
 interface Props {
   onGenerate: (config: RoastConfig) => void;
@@ -21,12 +21,63 @@ const VegetableIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const CUSTOM_KEY = 'roastmaster.customItems';
+const METHOD_LABELS: [CookingMethod, string][] = [
+  [CookingMethod.ROAST, 'Oven'],
+  [CookingMethod.HOB, 'Hob'],
+  [CookingMethod.BOIL, 'Boil/Steam'],
+];
+
+const loadCustom = (): VeggieSelection[] => {
+  try {
+    const raw = localStorage.getItem(CUSTOM_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
 export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
   const [meat, setMeat] = useState(MEAT_OPTIONS[0]);
   const [weight, setWeight] = useState(1.5);
   const [doneness, setDoneness] = useState<'Rare' | 'Medium' | 'Well Done'>('Medium');
   const [ovenType, setOvenType] = useState(OvenType.SINGLE);
-  const [veggies, setVeggies] = useState<VeggieSelection[]>(VEGGIE_OPTIONS);
+  const [veggies, setVeggies] = useState<VeggieSelection[]>(() => [...VEGGIE_OPTIONS, ...loadCustom()]);
+  const [customName, setCustomName] = useState('');
+  const [customMethod, setCustomMethod] = useState(CookingMethod.ROAST);
+  const [customMinutes, setCustomMinutes] = useState(20);
+  const [customNote, setCustomNote] = useState('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CUSTOM_KEY, JSON.stringify(veggies.filter(v => v.isCustom)));
+    } catch {
+      // storage unavailable; custom items last for this session only
+    }
+  }, [veggies]);
+
+  const addCustom = (item: CustomPreset) => {
+    const name = item.name.trim();
+    if (!name || !(item.durationMinutes > 0)) return;
+    setVeggies(prev => [...prev, {
+      id: `custom_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name,
+      selected: true,
+      method: item.method,
+      allowedMethods: [item.method],
+      isCustom: true,
+      durationMinutes: item.durationMinutes,
+      note: item.note?.trim() || undefined,
+    }]);
+  };
+
+  const handleAddFree = () => {
+    addCustom({ name: customName, method: customMethod, durationMinutes: customMinutes, note: customNote });
+    setCustomName('');
+    setCustomNote('');
+  };
+
+  const removeCustom = (id: string) => setVeggies(prev => prev.filter(v => v.id !== id));
   const [gravy, setGravy] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
   const [stuffing, setStuffing] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
   const [yorkshires, setYorkshires] = useState<'Packet' | 'Homemade' | 'None'>('Packet');
@@ -163,6 +214,16 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900">{veg.name}</span>
+                  {veg.isCustom && (
+                    <button
+                      type="button"
+                      onClick={() => removeCustom(veg.id)}
+                      aria-label={`Remove ${veg.name}`}
+                      className="ml-auto mr-2 text-gray-400 hover:text-rose-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                   <input 
                     type="checkbox" 
                     checked={veg.selected} 
@@ -182,10 +243,81 @@ export const SetupForm: React.FC<Props> = ({ onGenerate, isLoading }) => {
                   </select>
                 )}
                 {veg.selected && veg.allowedMethods.length === 1 && (
-                  <span className="text-xs text-gray-500 block px-1">{veg.method}</span>
+                  <span className="text-xs text-gray-500 block px-1">
+                    {veg.isCustom
+                      ? `${METHOD_LABELS.find(([m]) => m === veg.method)?.[1] ?? veg.method}, ${veg.durationMinutes} min`
+                      : veg.method}
+                  </span>
                 )}
               </div>
             ))}
+          </div>
+
+          <div className="rounded-xl border border-dashed border-emerald-300 p-4 space-y-4">
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Quick add</p>
+              <div className="flex flex-wrap gap-2">
+                {CUSTOM_PRESETS.map(p => (
+                  <button
+                    key={p.name}
+                    type="button"
+                    onClick={() => addCustom(p)}
+                    className="px-3 py-1 text-sm rounded-full border border-emerald-200 bg-white text-emerald-800 hover:bg-emerald-50"
+                  >
+                    + {p.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Add your own</p>
+              <div className="grid grid-cols-2 md:grid-cols-12 gap-2">
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFree(); } }}
+                  placeholder="Item name"
+                  maxLength={40}
+                  className="col-span-2 md:col-span-4 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
+                />
+                <select
+                  value={customMethod}
+                  onChange={(e) => setCustomMethod(e.target.value as CookingMethod)}
+                  className="md:col-span-3 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  {METHOD_LABELS.map(([m, label]) => <option key={m} value={m}>{label}</option>)}
+                </select>
+                <div className="md:col-span-2 flex items-center gap-1">
+                  <input
+                    type="number"
+                    min="1"
+                    max="300"
+                    value={customMinutes}
+                    onChange={(e) => setCustomMinutes(parseInt(e.target.value) || 0)}
+                    aria-label="Cooking time in minutes"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <span className="text-xs text-gray-500">min</span>
+                </div>
+                <input
+                  type="text"
+                  value={customNote}
+                  onChange={(e) => setCustomNote(e.target.value)}
+                  placeholder="Note (optional)"
+                  maxLength={80}
+                  className="col-span-2 md:col-span-3 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddFree}
+                  disabled={!customName.trim() || customMinutes <= 0}
+                  className="col-span-2 md:col-span-12 flex items-center justify-center gap-1 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-300 text-white text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4" /> Add item
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 

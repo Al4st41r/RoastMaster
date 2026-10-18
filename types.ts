@@ -2,6 +2,7 @@ export enum CookingMethod {
   ROAST = 'Roast',
   BOIL = 'Boil/Steam',
   MASH = 'Mash',
+  HOB = 'Hob',
   NONE = 'None'
 }
 
@@ -16,6 +17,9 @@ export interface VeggieSelection {
   selected: boolean;
   method: CookingMethod;
   allowedMethods: CookingMethod[];
+  isCustom?: boolean;
+  durationMinutes?: number;
+  note?: string;
 }
 
 export interface RoastConfig {

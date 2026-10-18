@@ -59,7 +59,33 @@ export const generateRoastSchedule = async (config: RoastConfig): Promise<RoastS
 
     // Veggies
     config.veggies.filter(v => v.selected).forEach(v => {
-        if (v.id === 'potatoes' && v.method === CookingMethod.ROAST) {
+        if (v.isCustom && v.durationMinutes) {
+             const lead = v.durationMinutes + 2;
+             const note = v.note ? ` ${v.note}` : '';
+             if (v.method === CookingMethod.ROAST) {
+                 steps.push({
+                    minutesBeforeServing: lead,
+                    action: `Put ${v.name} in oven`,
+                    description: `Cook for about ${v.durationMinutes} mins.${note}`,
+                    isAlert: true
+                 });
+                 steps.push({
+                    minutesBeforeServing: 2,
+                    action: `Take ${v.name} out`,
+                    description: `Remove from oven and keep warm.`,
+                    isAlert: false
+                 });
+             } else {
+                 const verb = v.method === CookingMethod.BOIL ? 'Start boiling' : 'Start cooking';
+                 const where = v.method === CookingMethod.BOIL ? 'in boiling salted water' : 'on the hob';
+                 steps.push({
+                    minutesBeforeServing: lead,
+                    action: `${verb} ${v.name}`,
+                    description: `Cook ${where} for about ${v.durationMinutes} mins.${note}`,
+                    isAlert: true
+                 });
+             }
+        } else if (v.id === 'potatoes' && v.method === CookingMethod.ROAST) {
              steps.push({
                 minutesBeforeServing: 70,
                 action: 'Prep Roast Potatoes',
